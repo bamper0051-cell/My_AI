@@ -49,6 +49,8 @@ class BaseAgent(ABC):
 
     def run(self, task: dict) -> dict:
         """Run the agent. Wraps execute() with logging & error handling."""
+        from .events_bus import emit
+        emit(self.name, type="agent_start")
         self._log(f"Starting on: {task.get('subtask', task.get('goal', '?'))[:120]}")
         t0 = time.time()
         try:
@@ -58,6 +60,14 @@ class BaseAgent(ABC):
         elapsed = round(time.time() - t0, 1)
         status_icon = "✓" if result.get("status") == "ok" else "✗"
         self._log(f"{status_icon} Done in {elapsed}s — {result.get('summary', '')[:100]}")
+        emit(
+            self.name,
+            type="agent_done",
+            status=result.get("status"),
+            summary=result.get("summary", ""),
+            elapsed=elapsed,
+            artifacts=result.get("artifacts", []),
+        )
         return result
 
     # ── Subclasses implement this ──────────────────────────────────────────
@@ -109,11 +119,13 @@ class BaseAgent(ABC):
 
     def save_artifact(self, filename: str, content: str | bytes) -> str:
         """Save a file under cfg.output_dir and return its path."""
+        from .events_bus import emit
         path = os.path.join(cfg.output_dir, filename)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         mode = "wb" if isinstance(content, bytes) else "w"
         with open(path, mode) as f:
             f.write(content)
+        emit(self.name, type="artifact", path=path, filename=filename)
         return path
 
     # ── Result constructors ────────────────────────────────────────────────
@@ -141,3 +153,5 @@ class BaseAgent(ABC):
     def _log(self, msg: str):
         if cfg.verbose:
             print(f"  [{self.name}] {msg}")
+        from .events_bus import emit
+        emit(self.name, type="log", message=msg)
