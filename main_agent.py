@@ -49,7 +49,7 @@ def main():
     else:
         # Interactive mode
         print("=" * 60)
-        print("  AUTONOMOUS AI AGENT")
+        print("  MATRIX AI AGENT")
         print("=" * 60)
         print("  Describe your idea (any language, any detail level).")
         print("  The agent will plan, design, code, and create assets.")

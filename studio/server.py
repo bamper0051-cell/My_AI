@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from . import events as ev_store
 from . import runner
 
-app = FastAPI(title="AI Studio", docs_url="/docs")
+app = FastAPI(title="Matrix AI", docs_url="/docs")
 
 _STATIC = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=_STATIC), name="static")

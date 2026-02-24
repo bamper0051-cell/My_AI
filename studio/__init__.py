@@ -1,1 +1,1 @@
-"""AI Studio — web interface for the autonomous agent pipeline."""
+"""Matrix AI — web interface for the autonomous agent pipeline."""
